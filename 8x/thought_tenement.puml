@@ -1,0 +1,40 @@
+@startuml rent_infomation_pubish
+class RentInfomationPubishContract <<Contract>> #IndianRed
+
+class Infomation <<Propasal>> #IndianRed {
+  + rentType
+  + location
+  + description
+  + images
+  .. rent only ..
+  - propertyInformation
+}
+
+class PropertyVerifier <<Domain>> #Orange
+
+class Publisher #Orange
+
+class PublishRequest <<FUlfillment>> #IndianRed {
+  - createdAt
+  - expiredAt
+}
+class PublishConfirmation <<Evidence>> #Orange {
+  - confirmeType
+  - confirmedAt
+}
+
+class AppUser <<Party>> #DarkSeaGreen
+
+class PublishedInformationAuditRequest #IndianRed
+class PublishedInformationAuditConfirmation #IndianRed
+
+
+RentInfomationPubishContract "1" -up- "1" Infomation
+Infomation -left- PropertyVerifier
+Infomation "1" -right- "1"  Publisher
+RentInfomationPubishContract "1" -right- "*" PublishRequest
+PublishConfirmation "1" -left- "1" PublishRequest
+AppUser -left-|> Publisher
+PublishConfirmation <|-- PublishedInformationAuditConfirmation
+PublishedInformationAuditConfirmation -left- PublishedInformationAuditRequest
+@enduml
