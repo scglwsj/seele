@@ -1,40 +1,142 @@
-@startuml rent_infomation_pubish
-class RentInfomationPubishContract <<Contract>> #IndianRed
+@startuml register_user
+package RegisterUserContext <<Rectangle>>{
+  object User #Orange
+  object UserRegistration <<Propasal>> #IndianRed
+  object UserRegistrationContract <<Contract>> #IndianRed
 
-class Infomation <<Propasal>> #IndianRed {
-  + rentType
-  + location
-  + description
-  + images
-  .. rent only ..
-  - propertyInformation
+  object PublishInformationRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object PublishInformationConfirmation <<Evidence>> #Orange {
+    - confirmeType
+    - confirmedAt
+  }
+
+  object ActivateRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object ActivateConfirmation <<Evidence>> #Orange {
+    - createdAt
+    - expiredAt
+  }
+
+
+  object DeleteRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object DeleteConfirmation <<Evidence>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  User "1" -left- "1" UserRegistration
+  UserRegistration "1" -- "1" UserRegistrationContract
+  UserRegistrationContract "1" -- "*" PublishInformationRequest
+  PublishInformationRequest "1" -- "1" PublishInformationConfirmation
+  UserRegistrationContract "1" -right- "1" ActivateRequest
+  ActivateRequest -- ActivateConfirmation
+  UserRegistrationContract "1" -left- "1" DeleteRequest
+  DeleteRequest -- DeleteConfirmation
 }
 
-class PropertyVerifier <<Domain>> #Orange
+package InformationPubulishContext <<Rectangle>> {
+  object PublisheInformationAuditRequest #IndianRed
+  object PublisheInformationAuditConfirmation #IndianRed
 
-class Publisher #Orange
-
-class PublishRequest <<FUlfillment>> #IndianRed {
-  - createdAt
-  - expiredAt
-}
-class PublishConfirmation <<Evidence>> #Orange {
-  - confirmeType
-  - confirmedAt
+  PublisheInformationAuditConfirmation -right- PublisheInformationAuditRequest
 }
 
-class AppUser <<Party>> #DarkSeaGreen
+object IndividualUser <<Party>> #DarkSeaGreen
+object PropertyManager <<Party>> #DarkSeaGreen
+object UserVerificationRequest #IndianRed
+object UserVerificationConfirmation #IndianRed
 
-class PublishedInformationAuditRequest #IndianRed
-class PublishedInformationAuditConfirmation #IndianRed
-
-
-RentInfomationPubishContract "1" -up- "1" Infomation
-Infomation -left- PropertyVerifier
-Infomation "1" -right- "1"  Publisher
-RentInfomationPubishContract "1" -right- "*" PublishRequest
-PublishConfirmation "1" -left- "1" PublishRequest
-AppUser -left-|> Publisher
-PublishConfirmation <|-- PublishedInformationAuditConfirmation
-PublishedInformationAuditConfirmation -left- PublishedInformationAuditRequest
+IndividualUser .right. PropertyManager
+(IndividualUser, PropertyManager) .down.|> User
+PublishInformationConfirmation <|.. PublisheInformationAuditConfirmation
+UserVerificationConfirmation .right.|> ActivateConfirmation
+UserVerificationRequest -- UserVerificationConfirmation
 @enduml
+
+@startuml pubish_infomation
+package PubulishInformationContext <<Rectangle>> {
+  object Infomation <<Propasal>> #IndianRed {
+    + rentType
+    + location
+    + description
+    + images
+    .. rent only ..
+    - propertyInformation
+  }
+
+  object PublishInformationRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+  object PublishInformationConfirmation <<Evidence>> #Orange {
+    - confirmeType
+    - confirmedAt
+  }
+
+  object RentInfomationPubishContract <<Contract>> #IndianRed
+  object Publisher #Orange
+
+  Infomation "1" -right- "1" RentInfomationPubishContract
+  Infomation "*" -left- "1"  Publisher
+  RentInfomationPubishContract "1" -down- "*" PublishInformationRequest
+  PublishInformationConfirmation "1" -right- "1" PublishInformationRequest
+}
+
+object PublisheInformationAuditRequest #IndianRed
+object PublisheInformationAuditConfirmation #IndianRed
+object AppUser <<Party>> #DarkSeaGreen
+
+PublishInformationConfirmation <|.. PublisheInformationAuditConfirmation
+PublisheInformationAuditConfirmation -right- PublisheInformationAuditRequest
+AppUser .down.|> Publisher
+@enduml
+
+@startuml promote_information
+package PromoteInformationContext <<Rectangle>> {
+  object PromotionBuyer #Orange
+  object PromoteInformationContract <<Contract>> #IndianRed
+  object Promotion <<Propasal>> #IndianRed
+
+  object DepositAccount<<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object PublishPromotionInformationRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object PromoteInformationRequest <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  object ConsignmentInvoice <<FUlfillment>> #IndianRed {
+    - createdAt
+    - expiredAt
+  }
+
+  PromoteInformationContract -left- DepositAccount
+  PromoteInformationContract -- PublishPromotionInformationRequest
+  PromoteInformationContract -- PromoteInformationRequest
+  PromoteInformationContract -right- ConsignmentInvoice
+  Promotion -- PromoteInformationContract
+  PromotionBuyer -left- Promotion
+}
+
+object AppUser <<Party>> #DarkSeaGreen
+
+AppUser .left.|> PromotionBuyer
+@enduml promote_information
