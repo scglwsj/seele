@@ -1,6 +1,6 @@
 @startuml user_service
 package UserServiceContext <<Rectangle>>{
-  object User #Orange
+  object User <<Participant>> #Orange
   object UserServiceContract <<Contract>> #IndianRed
 
   object UserRegistration <<Propasal>> #IndianRed {
@@ -16,7 +16,17 @@ package UserServiceContext <<Rectangle>>{
     - confirmeType
   }
 
-  object BannedAccountRequest <<FUlfillment>> #IndianRed {
+  object PromoteInformationRequest <<FUlfillment>> #IndianRed {
+    - infomation
+    - createdAt
+    - expiredAt
+  }
+
+  object PromoteInformationConfirmation <<Evidence>> #Orange {
+    - confirmeType
+  }
+
+  object BannedRequest <<FUlfillment>> #IndianRed {
     - createdAt
     - expiredAt
   }
@@ -56,21 +66,26 @@ package UserServiceContext <<Rectangle>>{
   UserRegistration "1" -- "1" UserServiceContract
   UserServiceContract "1" -- "*" PublishInformationRequest
   PublishInformationRequest "1" -- "1" PublishInformationConfirmation
+  UserServiceContract "1" -- "*" PromoteInformationRequest
+  PromoteInformationRequest "1" -- "1" PromoteInformationConfirmation
   UserServiceContract "1" -- "1" DeleteRequest
   DeleteRequest "1" -- "1" DeleteConfirmation
-  UserServiceContract "1" -- "*" BannedAccountRequest
-  BannedAccountRequest "1" -- "1" BannedConfirmation
+  UserServiceContract "1" -- "*" BannedRequest
+  BannedRequest "1" -- "1" BannedConfirmation
   UserServiceContract "1" -- "1" ActivateRequest
   ActivateRequest "1" -- "1" ActivateConfirmation
   UserServiceContract "1" -- "*" ComplaintBannedRequest
   ComplaintBannedRequest "1" -- "1" ComplaintBannedConfirmation
 }
 
-package PubulishInformationContext <<Rectangle>> {
-  object PublisheInformationRequest #IndianRed
-  object PublisheInformationConfirmation #IndianRed
+package InformationContext <<Rectangle>> {
+  object PublishRequest #IndianRed
+  object PublishConfirmation  #IndianRed
+  object PromoteRequest #IndianRed
+  object PromoteConfirmation #IndianRed
 
-  PublisheInformationConfirmation -- PublisheInformationRequest
+  PromoteConfirmation -- PromoteRequest
+  PublishConfirmation -- PublishRequest
 }
 
 package OperationContext <<Rectangle>> {
@@ -85,58 +100,91 @@ object PropertyManager <<Party>> #DarkSeaGreen
 
 IndividualUser ..^ User
 PropertyManager ..^ User
-PublishInformationConfirmation ^.. PublisheInformationConfirmation
+PublishInformationConfirmation ^.. PublishConfirmation
+PromoteInformationConfirmation ^.. PromoteConfirmation
 ActivateConfirmation ^.. UserVerificationConfirmation
 BannedConfirmation ^.. UserVerificationConfirmation
 ComplaintBannedConfirmation ^.. UserVerificationConfirmation
 @enduml
 
-@startuml pubish_infomation
+@startuml Publish_infomation
 package PubulishInformationContext <<Rectangle>> {
+  object PublishInfomationContract <<Contract>> #IndianRed
+  object Publisher <<Participant>> #Orange
+  object whistleblower <<Participant>> #Orange
+
   object Infomation <<Propasal>> #IndianRed {
-    + rentType
-    + location
-    + description
-    + images
+    - type
+    - location
+    - description
+    - images
     .. rent only ..
     - propertyInformation
+  }
+
+  object NotificationRequest <<FUlfillment>> #IndianRed {
+    - type
+    - message
+    - createdAt
+    - expiredAt
+  }
+
+  object NotificationConfirmation <<Evidence>> #Orange {
+    - createdAt
+  }
+
+  object HiddenInformationRequest <<FUlfillment>> #IndianRed {
+    - type
+    - description
+    - createdAt
+    - expiredAt
+  }
+
+  object HiddenInformationConfirmation <<Evidence>> #Orange {
+    - createdAt
   }
 
   object PublishInformationRequest <<FUlfillment>> #IndianRed {
     - createdAt
     - expiredAt
   }
+
   object PublishInformationConfirmation <<Evidence>> #Orange {
-    - confirmeType
-    - confirmedAt
+    - createdAt
   }
 
-  object RentInfomationPubishContract <<Contract>> #IndianRed
-  object Publisher #Orange
-
-  Infomation "1" -right- "1" RentInfomationPubishContract
-  Infomation "*" -left- "1"  Publisher
-  RentInfomationPubishContract "1" -down- "*" PublishInformationRequest
-  PublishInformationConfirmation "1" -right- "1" PublishInformationRequest
+  Publisher "1" -left- "*"  Infomation
+  whistleblower "0..1" -- "1"  HiddenInformationRequest
+  Infomation "1" -- "1" PublishInfomationContract
+  PublishInfomationContract "1" -- "*" HiddenInformationRequest
+  HiddenInformationRequest "1" -- "1" HiddenInformationConfirmation
+  HiddenInformationRequest -left[hidden]- PublishInformationRequest
+  NotificationRequest -right[hidden]- PublishInformationRequest
+  PublishInfomationContract "1" -- "*" PublishInformationRequest
+  PublishInformationRequest "1" -- "1" PublishInformationConfirmation
+  PublishInfomationContract "1" -- "*" NotificationRequest
+  NotificationRequest "1" -- "1" NotificationConfirmation
 }
 package OperationContext <<Rectangle>> {
-  object PublisheInformationAuditRequest #IndianRed
-  object PublisheInformationAuditConfirmation #IndianRed
-  PublisheInformationAuditConfirmation -right- PublisheInformationAuditRequest
-
+  object AuditInformationRequest #IndianRed
+  object AuditInformationConfirmation #IndianRed
+  AuditInformationConfirmation -- AuditInformationRequest
 }
 
 object IndividualAppUser <<Party>> #DarkSeaGreen
 object PropertyManagerAppUser <<Party>> #DarkSeaGreen
 
-PublishInformationConfirmation ^.. PublisheInformationAuditConfirmation
-IndividualAppUser ..^ Publisher
-PropertyManagerAppUser ..^ Publisher
+IndividualAppUser .left.^ Publisher
+PropertyManagerAppUser .left.^ Publisher
+IndividualAppUser .left.^ whistleblower
+PropertyManagerAppUser .left.^ whistleblower
+HiddenInformationConfirmation ^.. AuditInformationConfirmation
+PublishInformationConfirmation ^.. AuditInformationConfirmation
 @enduml
 
 @startuml promote_information
 package PromoteInformationContext <<Rectangle>> {
-  object PromotionBuyer #Orange
+  object PromotionBuyer <<Participant>> #Orange
   object PromoteInformationContract <<Contract>> #IndianRed
 
   object Promotion <<Propasal>> #IndianRed {
@@ -144,14 +192,13 @@ package PromoteInformationContext <<Rectangle>> {
   }
 
   object DeductRequest <<FUlfillment>> #IndianRed {
-    - price
     - clickStatistics
     - createdAt
     - expiredAt
   }
 
   object DeductConfirmation<<Evidence>> #Orange {
-    - amount
+    - price
     - createdAt
   }
 
@@ -186,6 +233,16 @@ package PromoteInformationContext <<Rectangle>> {
     - createdAt
   }
 
+  object SuspendPromotionRequest <<FUlfillment>> #IndianRed {
+    - type
+    - createdAt
+    - expiredAt
+  }
+
+  object SuspendPromotionConfirmation<<Evidence>> #IndianRed {
+    - createdAt
+  }
+
   object InvoiceRequest <<FUlfillment>> #IndianRed {
     - address
     - amount
@@ -203,8 +260,12 @@ package PromoteInformationContext <<Rectangle>> {
   DepositRequest "1" -- "1" RefundConfirmation
   PromoteInformationContract "1" -- "*" PublishPromotionRequest
   PublishPromotionRequest "1" -- "1" PublishPromotionConfirmation
+  PromoteInformationContract "1" -- "*" SuspendPromotionRequest
+  SuspendPromotionRequest "1" -- "1" SuspendPromotionConfirmation
   PromoteInformationContract "1" -- "*" DeductRequest
   DeductRequest "1" -- "1" DeductConfirmation
+  PublishPromotionRequest -right[hidden]- SuspendPromotionRequest
+  SuspendPromotionRequest -right[hidden]- InvoiceRequest
   PromoteInformationContract "1" -- "*" InvoiceRequest
   InvoiceRequest "1" -- "1" Invoicefirmation
   Promotion -- PromoteInformationContract
@@ -237,11 +298,11 @@ object ConsumptionCalculator #Orange
 object ADX #Orange
 
 PropertyManagerAppUser ..^ PromotionBuyer
+DeductConfirmation ^.. PaymentConfirmation
 DepositConfirmation ^.. PaymentConfirmation
 RefundConfirmation ^.. PaymentConfirmation
-DeductConfirmation ^.. PaymentConfirmation
 InvoiceRequest -right- ConsumptionCalculator
-DeductRequest -left- ADX
+DeductConfirmation -- ADX
 Invoicefirmation ^.. PostConfirmation
 PublishPromotionConfirmation ^.. PromotionAuditConfirm
 @enduml promote_information
