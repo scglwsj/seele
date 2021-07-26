@@ -12,7 +12,7 @@ package UserServiceContext <<Rectangle>>{
     - expiredAt
   }
 
-  object PublishInformationConfirmation <<Evidence>> #Orange {
+  object PublishInformationConfirmation <<Evidence>> #IndianRed {
     - confirmeType
   }
 
@@ -79,18 +79,15 @@ package UserServiceContext <<Rectangle>>{
 }
 
 package InformationContext <<Rectangle>> {
-  object PublishRequest #IndianRed
-  object PublishConfirmation  #IndianRed
-  object PromoteRequest #IndianRed
-  object PromoteConfirmation #IndianRed
+  object PromoteRequest <<FUlfillment>> #IndianRed
+  object PromoteConfirmation <<Evidence>> #IndianRed
 
   PromoteConfirmation -- PromoteRequest
-  PublishConfirmation -- PublishRequest
 }
 
 package OperationContext <<Rectangle>> {
-  object UserVerificationRequest #IndianRed
-  object UserVerificationConfirmation #IndianRed
+  object UserVerificationRequest <<FUlfillment>> #IndianRed
+  object UserVerificationConfirmation <<Evidence>> #IndianRed
   UserVerificationConfirmation --  UserVerificationRequest
 }
 
@@ -100,7 +97,6 @@ object PropertyManager <<Party>> #DarkSeaGreen
 
 IndividualUser ..^ User
 PropertyManager ..^ User
-PublishInformationConfirmation ^.. PublishConfirmation
 PromoteInformationConfirmation ^.. PromoteConfirmation
 ActivateConfirmation ^.. UserVerificationConfirmation
 BannedConfirmation ^.. UserVerificationConfirmation
@@ -129,7 +125,7 @@ package PubulishInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object NotificationConfirmation <<Evidence>> #Orange {
+  object NotificationConfirmation <<Evidence>> #IndianRed {
     - createdAt
   }
 
@@ -149,7 +145,7 @@ package PubulishInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object PublishInformationConfirmation <<Evidence>> #Orange {
+  object PublishInformationConfirmation <<Evidence>> #IndianRed {
     - createdAt
   }
 
@@ -159,15 +155,14 @@ package PubulishInformationContext <<Rectangle>> {
   PublishInfomationContract "1" -- "*" HiddenInformationRequest
   HiddenInformationRequest "1" -- "1" HiddenInformationConfirmation
   HiddenInformationRequest -left[hidden]- PublishInformationRequest
-  NotificationRequest -right[hidden]- PublishInformationRequest
   PublishInfomationContract "1" -- "*" PublishInformationRequest
   PublishInformationRequest "1" -- "1" PublishInformationConfirmation
   PublishInfomationContract "1" -- "*" NotificationRequest
   NotificationRequest "1" -- "1" NotificationConfirmation
 }
 package OperationContext <<Rectangle>> {
-  object AuditInformationRequest #IndianRed
-  object AuditInformationConfirmation #IndianRed
+  object AuditInformationRequest <<FUlfillment>> #IndianRed
+  object AuditInformationConfirmation <<Evidence>> #IndianRed
   AuditInformationConfirmation -- AuditInformationRequest
 }
 
@@ -179,7 +174,6 @@ PropertyManagerAppUser .left.^ Publisher
 IndividualAppUser .left.^ whistleblower
 PropertyManagerAppUser .left.^ whistleblower
 HiddenInformationConfirmation ^.. AuditInformationConfirmation
-PublishInformationConfirmation ^.. AuditInformationConfirmation
 @enduml
 
 @startuml promote_information
@@ -197,29 +191,29 @@ package PromoteInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object DeductConfirmation<<Evidence>> #Orange {
+  object DeductConfirmation <<Evidence>> #Orange {
     - price
     - createdAt
   }
 
-  object DepositRequest<<FUlfillment>> #IndianRed {
+  object DepositRequest <<FUlfillment>> #IndianRed {
     - amount
     - createdAt
     - expiredAt
   }
 
-  object DepositConfirmation<<Evidence>> #Orange {
+  object DepositConfirmation <<Evidence>> #Orange {
     - amount
     - createdAt
   }
 
-  object RefundRequest<<FUlfillment>> #IndianRed {
+  object RefundRequest <<FUlfillment>> #IndianRed {
     - amount
     - createdAt
     - expiredAt
   }
 
-  object RefundConfirmation<<Evidence>> #Orange {
+  object RefundConfirmation <<Evidence>> #Orange {
     - amount
     - createdAt
   }
@@ -229,7 +223,7 @@ package PromoteInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object PublishPromotionConfirmation<<Evidence>> #Orange {
+  object PublishPromotionConfirmation <<Evidence>> #IndianRed {
     - createdAt
   }
 
@@ -239,7 +233,7 @@ package PromoteInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object SuspendPromotionConfirmation<<Evidence>> #IndianRed {
+  object SuspendPromotionConfirmation <<Evidence>> #Orange {
     - createdAt
   }
 
@@ -250,7 +244,7 @@ package PromoteInformationContext <<Rectangle>> {
     - expiredAt
   }
 
-  object Invoicefirmation<<Evidence>> #Orange {
+  object Invoicefirmation <<Evidence>> #Orange {
     - createdAt
   }
 
@@ -273,24 +267,20 @@ package PromoteInformationContext <<Rectangle>> {
 }
 
 package FinanceContext <<Rectangle>> {
-  object PaymentRequest <<Evidence>> #IndianRed
-  object PaymentConfirmation <<FUlfillment>> #IndianRed
+  object PaymentRequest <<FUlfillment>> #IndianRed
+  object PaymentConfirmation <<Evidence>> #IndianRed
+  object InsufficientSuspendPromotionRequest <<FUlfillment>> #IndianRed
+  object InsufficientSuspendPromotionConfirmation <<Evidence>> #IndianRed
 
   PaymentConfirmation -- PaymentRequest
+  InsufficientSuspendPromotionConfirmation -- InsufficientSuspendPromotionRequest
 }
 
 package PostContext <<Rectangle>> {
-  object PostRequest <<Evidence>> #IndianRed
-  object PostConfirmation <<FUlfillment>> #IndianRed
+  object PostRequest <<FUlfillment>> #IndianRed
+  object PostConfirmation <<Evidence>> #IndianRed
 
   PostConfirmation -- PostRequest
-}
-
-package OperationContext <<Rectangle>> {
-  object PromotionAuditRequest #IndianRed
-  object PromotionAuditConfirm #IndianRed
-
-  PromotionAuditConfirm -- PromotionAuditRequest
 }
 
 object PropertyManagerAppUser <<Party>> #DarkSeaGreen
@@ -301,8 +291,8 @@ PropertyManagerAppUser ..^ PromotionBuyer
 DeductConfirmation ^.. PaymentConfirmation
 DepositConfirmation ^.. PaymentConfirmation
 RefundConfirmation ^.. PaymentConfirmation
+SuspendPromotionConfirmation ^.. InsufficientSuspendPromotionConfirmation
 InvoiceRequest -right- ConsumptionCalculator
 DeductConfirmation -- ADX
 Invoicefirmation ^.. PostConfirmation
-PublishPromotionConfirmation ^.. PromotionAuditConfirm
 @enduml promote_information
